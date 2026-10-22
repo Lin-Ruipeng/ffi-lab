@@ -7,5 +7,6 @@ dist/
 npm-debug.log*
 
 # 编辑器和系统临时文件。
+.vscode/
 .DS_Store
 *~
