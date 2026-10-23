@@ -1,0 +1,16 @@
+[package]
+name = "ts-rust-node-api-add"
+version = "1.0.0"
+edition = "2024"
+publish = false
+
+[lib]
+path = "native/lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+napi = { version = "=3.15.0", default-features = false, features = ["napi8"] }
+napi-derive = "=3.6.13"
+
+[build-dependencies]
+napi-build = "=2.6.0"

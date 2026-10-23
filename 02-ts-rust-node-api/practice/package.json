@@ -12,7 +12,7 @@
     "build:ts": "tsc -p tsconfig.json",
     "build": "npm run build::native && npm run build:ts",
     "typecheck": "npm run build:native && tsc -p tsconfig.json --noEmit",
-    "fmk:check": "cargo fmt --all -- --check",
+    "fmt:check": "cargo fmt --all -- --check",
     "lint:rust": "cargo clippy --locked -- -D warnings",
     "check": "npm run fmt:check && npm run lint:rust && npm run typecheck",
     "start": "node dist/src/index.js",
