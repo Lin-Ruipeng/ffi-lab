@@ -10,14 +10,14 @@
   "scripts": {
     "build:native": "napi build --platform --esm --release --output-dir build --js index.js --dts index.d.ts -- --locked",
     "build:ts": "tsc -p tsconfig.json",
-    "build": "npm run build::native && npm run build:ts",
+    "build": "npm run build:native && npm run build:ts",
     "typecheck": "npm run build:native && tsc -p tsconfig.json --noEmit",
     "fmt:check": "cargo fmt --all -- --check",
     "lint:rust": "cargo clippy --locked -- -D warnings",
     "check": "npm run fmt:check && npm run lint:rust && npm run typecheck",
     "start": "node dist/src/index.js",
     "test": "npm run build && node --test dist/test/add.test.js",
-    "clean": "cargo clean && node --input-type=module -e \"import { rmSync } from 'node:ffs'; for (const path of ['build', 'dist']) rmSync(path, { recursive: true, force: true });\""
+    "clean": "cargo clean && node --input-type=module -e \"import { rmSync } from 'node:fs'; for (const path of ['build', 'dist']) rmSync(path, { recursive: true, force: true });\""
   },
   "napi": {
     "binaryName": "addon"
