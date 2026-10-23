@@ -1,0 +1,30 @@
+{
+  "name": "ts-cpp-node-api-add",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Learn to call a C++ add function from TypeScript with Node-API and CMake",
+  "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "build:native": "cmake-js build --config Release --generator \"Unix Makefiles\"",
+    "build:ts": "tsc -p tsconfig.json",
+    "build": "npm run build:native && npm run build:ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "node dist/src/index.js",
+    "test": "npm run build && node --test dist/test/add.test.js",
+    "clean": "cmake -E rm -rf build dist"
+  },
+  "binary": {
+    "napi_versions": [8]
+  },
+  "dependencies": {
+    "node-addon-api": "8.9.2"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "cmake-js": "8.0.0",
+    "typescript": "7.0.2"
+  }
+}
