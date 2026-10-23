@@ -2,6 +2,7 @@
 node_modules/
 build/
 dist/
+target/
 *.node
 *.tsbuildinfo
 npm-debug.log*

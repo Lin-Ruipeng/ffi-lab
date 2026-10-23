@@ -1,0 +1,30 @@
+{
+  "name": "ts-rust-node-api-add",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Learn to call a Rust add function from TypeScript with napi-rs",
+  "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "build:native": "napi build --platform --esm --release --output-dir build --js index.js --dts index.d.ts -- --locked",
+    "build:ts": "tsc -p tsconfig.json",
+    "build": "npm run build::native && npm run build:ts",
+    "typecheck": "npm run build:native && tsc -p tsconfig.json --noEmit",
+    "fmk:check": "cargo fmt --all -- --check",
+    "lint:rust": "cargo clippy --locked -- -D warnings",
+    "check": "npm run fmt:check && npm run lint:rust && npm run typecheck",
+    "start": "node dist/src/index.js",
+    "test": "npm run build && node --test dist/test/add.test.js",
+    "clean": "cargo clean && node --input-type=module -e \"import { rmSync } from 'node:ffs'; for (const path of ['build', 'dist']) rmSync(path, { recursive: true, force: true });\""
+  },
+  "napi": {
+    "binaryName": "addon"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "3.10.9",
+    "@types/node": "24.19.2",
+    "typescript": "7.0.2"
+  }
+}

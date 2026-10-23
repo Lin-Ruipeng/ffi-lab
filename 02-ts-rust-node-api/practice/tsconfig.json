@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "target": "es2022",
+        "module": "nodenext",
+        "moduleResolution": "nodenext",
+        "rootDir": ".",
+        "outDir": "dist",
+        "strict": true,
+        "types": [
+            "node"
+        ],
+        "verbatimModuleSyntax": true,
+        "noEmitOnError": true,
+        "forceConsistentCasingInFileNames": true
+    },
+    "include": [
+        "src/**/*.ts",
+        "test/**/*.ts"
+    ]
+}
