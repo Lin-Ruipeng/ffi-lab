@@ -8,6 +8,18 @@ target/
 npm-debug.log*
 reference/
 
+# Python 虚拟环境、缓存和原生扩展产物。
+.venv/
+.venv-wheel/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+*.so
+*.pyd
+
 # 编辑器和系统临时文件。
 .vscode/
 .DS_Store

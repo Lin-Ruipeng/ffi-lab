@@ -1,6 +1,6 @@
 # ffi-lab：跨语言调用学习笔记
 
-这个仓库用于逐个学习跨语言函数调用。每种调用场景拥有独立的课程目录、教程和示例，不在仓库根目录安装 npm 依赖。
+这个仓库用于逐个学习跨语言函数调用。每种调用场景拥有独立的课程目录、教程和示例，不在仓库根目录安装项目依赖。
 
 | 课程 | 调用方向 | 内容 |
 | --- | --- | --- |
@@ -8,6 +8,8 @@
 | [02：TypeScript 调用 Rust](02-ts-rust-node-api/README.md) | TS → Node-API → Rust | 加法函数、Cargo、napi-rs、自动类型声明、测试、Git 提交 |
 | [03：TypeScript 异步调用 C++](03-ts-cpp-async-matrix/README.md) | TS → Promise / Node-API → C++ | 动态二维矩阵乘法、AsyncWorker、线程边界、并发测试 |
 | [04：TypeScript 异步调用 Rust](04-ts-rust-async-matrix/README.md) | TS → Promise / Node-API → Rust | 动态二维矩阵乘法、AsyncTask、所有权、自动类型声明 |
+| [05：Python 调用 C++](05-python-cpp-pybind11/README.md) | Python → pybind11 → C++ | 同步加法、uv、CMake、wheel、类型声明与测试 |
+| [06：Python 调用 Rust](06-python-rust-pyo3/README.md) | Python → PyO3 → Rust | 同步加法、uv、Maturin、双锁文件、wheel 与测试 |
 
 每课独立配置工具链、安装依赖和管理锁文件。
 
@@ -25,7 +27,7 @@ Agent 负责教材、对照成品和验证，你按手册亲手编写练习源�
 
 ## 从哪里开始
 
-首次学习可以打开[第一课教程](01-ts-cpp-node-api/README.md)，接着学习[第二课 Rust 加法](02-ts-rust-node-api/README.md)、[第三课 C++ 异步矩阵乘法](03-ts-cpp-async-matrix/README.md)和[第四课 Rust 异步矩阵乘法](04-ts-rust-async-matrix/README.md)。每课从第 0 节按顺序操作，在对应的 `practice/` 中亲手创建项目，并理解每份文件为什么存在。
+首次学习可以打开[第一课教程](01-ts-cpp-node-api/README.md)，接着学习[第二课 Rust 加法](02-ts-rust-node-api/README.md)、[第三课 C++ 异步矩阵乘法](03-ts-cpp-async-matrix/README.md)、[第四课 Rust 异步矩阵乘法](04-ts-rust-async-matrix/README.md)、[第五课 Python 调用 C++](05-python-cpp-pybind11/README.md)和[第六课 Python 调用 Rust](06-python-rust-pyo3/README.md)。每课从第 0 节按顺序操作，在对应的 `practice/` 中亲手创建项目，并理解每份文件为什么存在。
 
 ```text
 ffi-lab/                         # 唯一的 Git 仓库根目录
@@ -47,14 +49,26 @@ ffi-lab/                         # 唯一的 Git 仓库根目录
 │   ├── VERIFICATION.md
 │   ├── reference/
 │   └── practice/                 # 用户按手册创建
-└── 04-ts-rust-async-matrix/
+├── 04-ts-rust-async-matrix/
+│   ├── README.md
+│   ├── VERIFICATION.md
+│   ├── reference/
+│   └── practice/                 # 用户按手册创建
+├── 05-python-cpp-pybind11/
+│   ├── README.md
+│   ├── VERIFICATION.md
+│   ├── reference/
+│   └── practice/                 # 用户按手册创建
+└── 06-python-rust-pyo3/
     ├── README.md
     ├── VERIFICATION.md
     ├── reference/
-    └── practice/                 # 第四课交付时不创建
+    └── practice/                 # 第六课交付时不创建
 ```
 
-`practice/` 的源码也可以提交到本仓库；其 `node_modules/`、`build/`、`dist/` 和 Rust 的 `target/` 会被根目录的 `.gitignore` 忽略。子目录共享根仓库，不需要再次 `git init`。
+`practice/` 的源码也可以提交到本仓库；其 `node_modules/`、`build/`、`dist/`、Rust 的 `target/`、Python 虚拟环境与缓存会被根目录的 `.gitignore` 忽略。子目录共享根仓库，不需要再次 `git init`。
+
+`reference/` 是当前工作副本中的本地对照成品，按仓库约定不纳入版本控制，不会随 Git clone 分发。若对应目录不存在，直接按完整手册创建 `practice/`；成品命令适用于已有本地成品的工作副本。
 
 ## 想先看看运行效果
 
@@ -119,8 +133,49 @@ ffi-lab/                         # 唯一的 Git 仓库根目录
 
 预期 25 项真实 Rust 集成测试通过，主程序输出与第三课一致，并通过 rustfmt、Clippy 和 TS 类型检查。心跳演示观察 AsyncTask 后台计算，输入快照、输出与错误类型可和第三课对照。
 
+第五课：
+
+```bash
+(
+  cd 05-python-cpp-pybind11/reference
+  uv python install 3.12.15 --no-bin
+  uv sync --locked
+  uv run --no-sync python -m cpp_add
+  uv run --no-sync pytest
+  uv run --no-sync ruff check .
+  uv run --no-sync ruff format --check .
+  uv run --no-sync mypy
+)
+```
+
+预期输出 `add(2, 3) = 5.0`，20 项原生调用集成测试通过，Ruff 与 mypy 检查通过。使用 uv 托管的 Python，与系统 Python 分开；修改 C++ 后按手册显式重编译。
+
+第六课：
+
+```bash
+(
+  cd 06-python-rust-pyo3/reference
+  uv python install 3.12.15 --no-bin
+  cargo fetch --locked
+  uv sync --locked
+  uv run --no-sync python -m rust_add
+  uv run --no-sync pytest
+  uv run --no-sync ruff check .
+  uv run --no-sync ruff format --check .
+  uv run --no-sync mypy
+  cargo fmt --all -- --check
+  PYO3_PYTHON="$PWD/.venv/bin/python" cargo clippy --locked --all-targets -- -D warnings
+)
+```
+
+预期同样输出 `add(2, 3) = 5.0`、20 项原生调用测试通过，并通过 Python 检查、rustfmt 与 Clippy。Python 开发依赖与 Rust 依赖分别由 uv.lock 和 Cargo.lock 管理；修改 Rust 后按手册重新编译安装。
+
 ## 验证范围
 
-四课均在 Ubuntu 26.04.1、Node.js 24.21.0 上实际验证，第二、四课使用 Rust 1.99.1。详细工具版本、从空目录复走手册的结果和验证边界分别见[第一课验证记录](01-ts-cpp-node-api/VERIFICATION.md)、[第二课验证记录](02-ts-rust-node-api/VERIFICATION.md)、[第三课验证记录](03-ts-cpp-async-matrix/VERIFICATION.md)与[第四课验证记录](04-ts-rust-async-matrix/VERIFICATION.md)。
+前四课均在 Ubuntu 26.04.1、Node.js 24.21.0 上实际验证，第二、四课使用 Rust 1.99.1。详细工具版本、从空目录复走手册的结果和验证边界分别见[第一课验证记录](01-ts-cpp-node-api/VERIFICATION.md)、[第二课验证记录](02-ts-rust-node-api/VERIFICATION.md)、[第三课验证记录](03-ts-cpp-async-matrix/VERIFICATION.md)与[第四课验证记录](04-ts-rust-async-matrix/VERIFICATION.md)。
+
+第五课在同一 Ubuntu/Linux x64 环境使用 uv 0.13.5、CPython 3.12.15 和 CMake 实际验证，包含手册重建、清理重编译和独立 wheel 安装。详见[第五课验证记录](05-python-cpp-pybind11/VERIFICATION.md)。
+
+第六课使用相同的 uv/Python 与 Rust 1.99.1、PyO3 0.30.1、Maturin 1.15.0，验证范围包括真实调用、手册从零重建、清理重编译和独立 wheel 安装。详见[第六课验证记录](06-python-rust-pyo3/VERIFICATION.md)。
 
 教程包含分阶段的本地提交命令；正式仓库的暂存、提交和推送由用户执行。
