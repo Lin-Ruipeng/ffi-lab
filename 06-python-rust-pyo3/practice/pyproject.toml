@@ -1,0 +1,58 @@
+[build-system]
+requires = ["maturin==1.15.0"]
+build-backend = "maturin"
+
+[project]
+name = "py-rust-pyo3-add"
+version = "0.1.0"
+description = "Learn to call a Rust add function from Python with PyO3"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+
+[dependency-groups]
+dev = ["pytest==9.1.1", "ruff==0.17.2", "mypy==2.4.0"]
+
+[tool.maturin]
+bindings = "pyo3"
+python-source = "src"
+module-name = "rust_add._core"
+profile = "release"
+locked = true
+compatibility = "linux"
+strip = true
+include = [
+    { path = ".python-version", format = "sdist" },
+    { path = "uv.lock", format = "sdist" },
+    { path = "Cargo.lock", format = "sdist" },
+    { path = "tests/*.py", format = "sdist" },
+]
+exclude = [
+    "src/rust_add/*.so",
+    "src/rust_add/*.pyd",
+    "**/__pycache__/**",
+    "**/*.pyc",
+    ".venv/**",
+    ".venv-wheel/**",
+    "target/**",
+    "dist/**",
+    ".pytest_cache/**",
+    ".ruff_cache/**",
+    ".mypy_cache/**",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+extend-exclude = [".venv-wheel"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src", "tests"]
