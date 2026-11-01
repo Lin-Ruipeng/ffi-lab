@@ -1,0 +1,28 @@
+[package]
+name = "py-rust-pyo3-add"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+publish = false
+readme = "README.md"
+include = [
+    "Cargo.toml",
+    "Cargo.lock",
+    "pyproject.toml",
+    ".python-version",
+    "uv.lock",
+    "README.md",
+    "native/*.rs",
+    "src/rust_add/*.py",
+    "src/rust_add/*.pyi",
+    "src/rust_add/py.typed",
+    "tests/*.py",
+]
+
+[lib]
+name = "_core"
+path = "native/lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = "=0.30.1"
