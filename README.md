@@ -10,6 +10,8 @@
 | [04：TypeScript 异步调用 Rust](04-ts-rust-async-matrix/README.md) | TS → Promise / Node-API → Rust | 动态二维矩阵乘法、AsyncTask、所有权、自动类型声明 |
 | [05：Python 调用 C++](05-python-cpp-pybind11/README.md) | Python → pybind11 → C++ | 同步加法、uv、CMake、wheel、类型声明与测试 |
 | [06：Python 调用 Rust](06-python-rust-pyo3/README.md) | Python → PyO3 → Rust | 同步加法、uv、Maturin、双锁文件、wheel 与测试 |
+| [07：Python 异步调用 C++](07-python-cpp-async-matrix/README.md) | Python → asyncio / pybind11 → C++ | 动态矩阵乘法、线程池、释放 GIL、快照、取消与 wheel |
+| [08：Python 异步调用 Rust](08-python-rust-async-matrix/README.md) | Python → asyncio / PyO3 → Rust | 动态矩阵乘法、线程池、detach、所有权、双锁文件与 wheel |
 
 每课独立配置工具链、安装依赖和管理锁文件。
 
@@ -27,7 +29,7 @@ Agent 负责教材、对照成品和验证，你按手册亲手编写练习源�
 
 ## 从哪里开始
 
-首次学习可以打开[第一课教程](01-ts-cpp-node-api/README.md)，接着学习[第二课 Rust 加法](02-ts-rust-node-api/README.md)、[第三课 C++ 异步矩阵乘法](03-ts-cpp-async-matrix/README.md)、[第四课 Rust 异步矩阵乘法](04-ts-rust-async-matrix/README.md)、[第五课 Python 调用 C++](05-python-cpp-pybind11/README.md)和[第六课 Python 调用 Rust](06-python-rust-pyo3/README.md)。每课从第 0 节按顺序操作，在对应的 `practice/` 中亲手创建项目，并理解每份文件为什么存在。
+首次学习可以打开[第一课教程](01-ts-cpp-node-api/README.md)，接着学习[第二课 Rust 加法](02-ts-rust-node-api/README.md)、[第三课 C++ 异步矩阵乘法](03-ts-cpp-async-matrix/README.md)、[第四课 Rust 异步矩阵乘法](04-ts-rust-async-matrix/README.md)、[第五课 Python 调用 C++](05-python-cpp-pybind11/README.md)、[第六课 Python 调用 Rust](06-python-rust-pyo3/README.md)、[第七课 Python 异步调用 C++](07-python-cpp-async-matrix/README.md)和[第八课 Python 异步调用 Rust](08-python-rust-async-matrix/README.md)。每课从第 0 节按顺序操作，在对应的 `practice/` 中亲手创建项目，并理解每份文件为什么存在。
 
 ```text
 ffi-lab/                         # 唯一的 Git 仓库根目录
@@ -59,11 +61,21 @@ ffi-lab/                         # 唯一的 Git 仓库根目录
 │   ├── VERIFICATION.md
 │   ├── reference/
 │   └── practice/                 # 用户按手册创建
-└── 06-python-rust-pyo3/
+├── 06-python-rust-pyo3/
+│   ├── README.md
+│   ├── VERIFICATION.md
+│   ├── reference/
+│   └── practice/                 # 用户按手册创建
+├── 07-python-cpp-async-matrix/
+│   ├── README.md
+│   ├── VERIFICATION.md
+│   ├── reference/
+│   └── practice/                 # 第七课交付时不创建
+└── 08-python-rust-async-matrix/
     ├── README.md
     ├── VERIFICATION.md
     ├── reference/
-    └── practice/                 # 第六课交付时不创建
+    └── practice/                 # 第八课交付时不创建
 ```
 
 `practice/` 的源码也可以提交到本仓库；其 `node_modules/`、`build/`、`dist/`、Rust 的 `target/`、Python 虚拟环境与缓存会被根目录的 `.gitignore` 忽略。子目录共享根仓库，不需要再次 `git init`。
@@ -170,6 +182,45 @@ ffi-lab/                         # 唯一的 Git 仓库根目录
 
 预期同样输出 `add(2, 3) = 5.0`、20 项原生调用测试通过，并通过 Python 检查、rustfmt 与 Clippy。Python 开发依赖与 Rust 依赖分别由 uv.lock 和 Cargo.lock 管理；修改 Rust 后按手册重新编译安装。
 
+第七课：
+
+```bash
+(
+  cd 07-python-cpp-async-matrix/reference
+  uv python install 3.12.15 --no-bin
+  uv sync --locked
+  uv run --no-sync python -m cpp_matrix
+  uv run --no-sync python -m cpp_matrix.heartbeat
+  uv run --no-sync pytest
+  uv run --no-sync ruff check .
+  uv run --no-sync ruff format --check .
+  uv run --no-sync mypy
+)
+```
+
+预期 49 项真实调用测试通过，矩阵结果为 `[[58.0, 64.0], [139.0, 154.0]]`，并展示 gather 并发与 OverflowError。心跳观察线程池调用期间的事件循环；次数和耗时随机器变化。协程启动时复制输入，纯 C++ 计算期间释放 GIL；取消等待不会强制终止已运行的原生计算。
+
+第八课：
+
+```bash
+(
+  cd 08-python-rust-async-matrix/reference
+  uv python install 3.12.15 --no-bin
+  cargo fetch --locked
+  uv sync --locked
+  uv run --no-sync python -m rust_matrix
+  uv run --no-sync python -m rust_matrix.heartbeat
+  uv run --no-sync pytest
+  uv run --no-sync ruff check .
+  uv run --no-sync ruff format --check .
+  uv run --no-sync mypy
+  cargo fmt --all -- --check
+  PYO3_PYTHON="$PWD/.venv/bin/python" cargo clippy --locked --all-targets -- -D warnings
+)
+```
+
+预期同样为 49 项真实 Rust 调用测试通过，输出与第七课一致，并通过 Python 检查、rustfmt 与 Clippy。线程池调用同步 PyO3 扩展，Rust 将自有矩阵移入 `Python::detach` 闭包，在计算期间释放 GIL；异步调度来自 asyncio。两套锁文件、快照和取消语义可与第六、七课对照。
+
 ## 验证范围
 
 前四课均在 Ubuntu 26.04.1、Node.js 24.21.0 上实际验证，第二、四课使用 Rust 1.99.1。详细工具版本、从空目录复走手册的结果和验证边界分别见[第一课验证记录](01-ts-cpp-node-api/VERIFICATION.md)、[第二课验证记录](02-ts-rust-node-api/VERIFICATION.md)、[第三课验证记录](03-ts-cpp-async-matrix/VERIFICATION.md)与[第四课验证记录](04-ts-rust-async-matrix/VERIFICATION.md)。
@@ -177,5 +228,9 @@ ffi-lab/                         # 唯一的 Git 仓库根目录
 第五课在同一 Ubuntu/Linux x64 环境使用 uv 0.13.5、CPython 3.12.15 和 CMake 实际验证，包含手册重建、清理重编译和独立 wheel 安装。详见[第五课验证记录](05-python-cpp-pybind11/VERIFICATION.md)。
 
 第六课使用相同的 uv/Python 与 Rust 1.99.1、PyO3 0.30.1、Maturin 1.15.0，验证范围包括真实调用、手册从零重建、清理重编译和独立 wheel 安装。详见[第六课验证记录](06-python-rust-pyo3/VERIFICATION.md)。
+
+第七课沿用 Python/C++ 工具链，使用 uv 0.13.6、CPython 3.12.15 和 pybind11 3.1.0，验证异步调用、快照、GIL 心跳负对照、取消、手册重建及独立 wheel 的完整测试和类型信息。详见[第七课验证记录](07-python-cpp-async-matrix/VERIFICATION.md)。
+
+第八课沿用第六课的 Rust/PyO3/Maturin 与第七课的 asyncio 模型，验证真实异步调用、detach/GIL 心跳负对照、所有权与快照、取消、双锁文件、手册从零重建及独立 wheel 的完整测试和类型信息。详见[第八课验证记录](08-python-rust-async-matrix/VERIFICATION.md)。
 
 教程包含分阶段的本地提交命令；正式仓库的暂存、提交和推送由用户执行。
