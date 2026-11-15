@@ -234,3 +234,7 @@ ffi-lab/                         # 唯一的 Git 仓库根目录
 第八课沿用第六课的 Rust/PyO3/Maturin 与第七课的 asyncio 模型，验证真实异步调用、detach/GIL 心跳负对照、所有权与快照、取消、双锁文件、手册从零重建及独立 wheel 的完整测试和类型信息。详见[第八课验证记录](08-python-rust-async-matrix/VERIFICATION.md)。
 
 教程包含分阶段的本地提交命令；正式仓库的暂存、提交和推送由用户执行。
+
+## 许可证
+
+本项目以 [MIT 许可证](LICENSE)发布，版权归 Lin Ruipeng 所有。复制、修改、分发或再发布本仓库内容时，请保留 [LICENSE](LICENSE) 中的版权声明和许可声明。
